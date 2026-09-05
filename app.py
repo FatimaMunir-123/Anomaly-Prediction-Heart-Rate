@@ -9,7 +9,7 @@ st.set_page_config(
 )
 
 # Load trained machine learning model
-pipeline = joblib.load("heart_rate_anomaly_model.pkl")
+pipeline = joblib.load("heart_rate_anomaly_model (1).pkl")
 
 # Model features
 features = [
