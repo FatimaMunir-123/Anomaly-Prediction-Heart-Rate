@@ -57,7 +57,7 @@ col1, col2, col3 = st.columns(3)
 
 for i, feature in enumerate(features):
 
-```
+
 if i % 3 == 0:
     container = col1
 elif i % 3 == 1:
