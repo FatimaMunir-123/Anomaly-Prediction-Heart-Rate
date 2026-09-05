@@ -1,4 +1,4 @@
-
+```python
 import streamlit as st
 import pandas as pd
 import joblib
@@ -9,7 +9,8 @@ st.set_page_config(
     layout="wide"
 )
 
-pipeline = joblib.load("heart_rate_anomaly_model.pkl")
+# Load trained ML model
+pipeline = joblib.load("heart_rate_anomaly_model (1).pkl")
 
 features = [
     "VLF", "VLF_PCT", "LF", "LF_PCT", "LF_NU",
@@ -17,7 +18,9 @@ features = [
 ]
 
 st.title("❤️ Heart Rate Anomaly Detection")
-st.write("Machine Learning System for Frequency-Domain Heart Rate Anomaly Detection")
+st.write(
+    "Machine Learning System for Frequency-Domain Heart Rate Anomaly Detection"
+)
 
 st.subheader("Enter Heart Rate Features")
 
@@ -26,6 +29,7 @@ values = {}
 col1, col2, col3 = st.columns(3)
 
 for i, feature in enumerate(features):
+
     if i % 3 == 0:
         container = col1
     elif i % 3 == 1:
@@ -72,3 +76,4 @@ st.info(
     "This system detects statistically unusual patterns in heart-rate "
     "frequency-domain features. It is not a medical diagnosis."
 )
+```
