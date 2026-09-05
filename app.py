@@ -36,11 +36,11 @@ st.write(
 st.divider()
 
 # Input section
-st.subheader("🫀 Enter Heart Rate Features")
+st.subheader("🫀 Heart Rate Monitoring")
+
 st.write(
-    "Enter the frequency-domain heart rate values below "
-    "and click Predict to detect whether the pattern is "
-    "normal or anomalous."
+    "Adjust the heart-rate frequency features using the sliders "
+    "and monitor the pattern before running the prediction."
 )
 
 values = {}
@@ -49,6 +49,7 @@ values = {}
 col1, col2, col3 = st.columns(3)
 
 for i, feature in enumerate(features):
+
     if i % 3 == 0:
         container = col1
     elif i % 3 == 1:
@@ -56,16 +57,100 @@ for i, feature in enumerate(features):
     else:
         container = col3
 
-    values[feature] = container.number_input(
-        feature,
-        value=0.0,
-        format="%.6f"
-    )
+    if feature in ["VLF", "LF", "HF", "TP"]:
+        values[feature] = container.slider(
+            feature,
+            min_value=0.0,
+            max_value=50000.0,
+            value=1000.0,
+            step=0.01
+        )
+
+    elif feature in [
+        "VLF_PCT",
+        "LF_PCT",
+        "HF_PCT",
+        "LF_NU",
+        "HF_NU"
+    ]:
+        values[feature] = container.slider(
+            feature,
+            min_value=0.0,
+            max_value=100.0,
+            value=50.0,
+            step=0.1
+        )
+
+    else:
+        values[feature] = container.slider(
+            feature,
+            min_value=0.0,
+            max_value=20.0,
+            value=1.0,
+            step=0.01
+        )
 
 st.divider()
 
-# Prediction button
-if st.button("🔍 Predict", use_container_width=True):
+# Live chart
+st.subheader("📈 Live Feature Monitor")
+
+chart_data = pd.DataFrame({
+    "Feature": features,
+    "Value": [values[feature] for feature in features]
+})
+
+st.line_chart(
+    chart_data.set_index("Feature"),
+    use_container_width=True
+)
+
+st.divider()
+
+# Buttons
+predict_col, monitor_col = st.columns(2)
+
+with predict_col:
+    predict_button = st.button(
+        "🔍 Predict Anomaly",
+        use_container_width=True
+    )
+
+with monitor_col:
+    monitor_button = st.button(
+        "🖥️ Monitor",
+        use_container_width=True
+    )
+
+# Monitor
+if monitor_button:
+
+    st.subheader("🖥️ Monitoring Status")
+
+    st.success(
+        "🟢 Monitoring Active"
+    )
+
+    st.write(
+        "The current heart-rate frequency-domain features "
+        "are being monitored."
+    )
+
+    monitor_data = pd.DataFrame({
+        "Feature": features,
+        "Current Value": [
+            values[feature] for feature in features
+        ]
+    })
+
+    st.dataframe(
+        monitor_data,
+        use_container_width=True
+    )
+
+# Prediction
+if predict_button:
+
     # Create input dataframe
     input_data = pd.DataFrame(
         [[values[feature] for feature in features]],
@@ -78,16 +163,23 @@ if st.button("🔍 Predict", use_container_width=True):
     # Get anomaly score
     score = pipeline.decision_function(input_data)[0]
 
+    st.divider()
+
     st.subheader("📊 Prediction Result")
 
     if prediction == 1:
+
         st.success("🟢 NORMAL")
+
         st.write(
             "The input pattern is statistically normal "
             "according to the trained Isolation Forest model."
         )
+
     else:
+
         st.error("🔴 ANOMALY")
+
         st.write(
             "The input pattern is statistically unusual "
             "according to the trained Isolation Forest model."
@@ -99,8 +191,12 @@ if st.button("🔍 Predict", use_container_width=True):
     )
 
     # Show entered values
-    with st.expander("View Input Values"):
-        st.dataframe(input_data, use_container_width=True)
+    with st.expander("📋 View Input Values"):
+
+        st.dataframe(
+            input_data,
+            use_container_width=True
+        )
 
 st.divider()
 
